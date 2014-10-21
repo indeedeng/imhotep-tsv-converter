@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.indeed</groupId>
+        <artifactId>imhotep-tsv-converter</artifactId>
+        <version>1.0.0</version>
+	</parent>
+
+	<artifactId>index-builder-util</artifactId>
+	<name>Imhotep Index Builder Utilities</name>
+	<version>1.0.0</version>
+	<description>
+        Abstract framework for imhotep index builders
+    </description>
+
+	<scm> <!-- prevent Maven from trying to override with subproject suffix -->
+		<url>${project.parent.scm.url}</url>
+		<connection>${project.parent.scm.connection}</connection>
+		<developerConnection>${project.parent.scm.developerConnection}</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${joda-time.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit-dep</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<joda-time.version>2.0</joda-time.version>
+	</properties>
+
+</project>
+
