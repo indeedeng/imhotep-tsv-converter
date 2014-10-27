@@ -119,7 +119,8 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
             throw new RuntimeException("No data is available in the input file. At least one line of data past the header is required");
         }
         log.info("Scanning the file to detect int fields");
-        for(String[] values = iterator.next(); iterator.hasNext(); values = iterator.next()) {
+        while(iterator.hasNext()) {
+            final String[] values = iterator.next();
             final int valueCount = Math.min(values.length, indexFields.length);
             rowCount++;
             for(int i = 0; i < valueCount; i++) {
@@ -220,7 +221,8 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         try {
             Iterator<String[]> iterator = reader.iterator();
             iterator.next();  // skip header
-            for(String[] values = iterator.next(); iterator.hasNext(); values = iterator.next()) {
+            while(iterator.hasNext()) {
+                final String[] values = iterator.next();
                 final int valueCount = Math.min(values.length, indexFields.length);
                 if(valueCount != indexFields.length) {
                     // inconsistent number of columns detected
