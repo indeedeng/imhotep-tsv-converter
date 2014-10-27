@@ -1,12 +1,13 @@
-/bin
-/target
+bin/
+target/
 
 # /
-/*.iml
-/web-build
-/build-transient-src
-/build
-/dist
+*.iml
+*.idea
+web-build/
+build-transient-src/
+build/
+dist/
 .settings/
 .classpath
 .project
