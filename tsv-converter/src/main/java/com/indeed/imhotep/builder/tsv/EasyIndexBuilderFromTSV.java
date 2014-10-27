@@ -113,6 +113,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
 
     private void detectIntFields(Iterator<String[]> iterator) throws IOException {
         final int[] intValCount = new int[indexFields.length];
+        final int[] blankValCount = new int[indexFields.length];
         final boolean[] isInt = new boolean[indexFields.length];
         Arrays.fill(isInt, true);
         if(!iterator.hasNext()) {
@@ -130,9 +131,11 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
 
                 if(Longs.tryParse(values[i]) != null) {
                     intValCount[i]++;
+                } else if(values[i].isEmpty()) {
+                    blankValCount[i]++;
                 }
 
-                if(rowCount > 10000 && intValCount[i] < rowCount / 10 * 9) {
+                if(rowCount > 10000 && !isIntField(intValCount[i], blankValCount[i], rowCount)) {
                     isInt[i] = false;
                 }
             }
@@ -140,7 +143,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         int intFieldCount = 0;
         List<String> intFields = Lists.newArrayList();
         for(int i = 0; i < indexFields.length; i++) {
-            boolean isIntField = isInt[i] && intValCount[i] > rowCount / 10 * 9; // over 90% fit
+            boolean isIntField = isInt[i] && isIntField(intValCount[i], blankValCount[i], rowCount);
             if(isIntField) {
                 intFields.add(indexFields[i].getName());
             }
@@ -148,6 +151,25 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         }
         Collections.sort(intFields);
         log.info("Int fields detected: " + Joiner.on(",").join(intFields));
+    }
+
+    /**
+     * Tries to guess if the field should be considered an int field rather than
+     * a string field based on counts of int values, blanks, and other strings
+     * in it. We consider it an int field if it has at least 20% ints, less than
+     * 10% other strings and the rest can be either ints or blanks.
+     */
+    private static boolean isIntField(int intValCount, int blankValCount, int rowCount) {
+        if (intValCount < rowCount / 20) {
+            // there are under 20% ints, so consider it a string field
+            return false;
+        }
+        // we have a good number of int values, consider blanks to be 0s
+        return (intValCount + blankValCount) > rowCount / 10 * 9; // require
+                                                                  // over 90%
+                                                                  // fit to be
+                                                                  // considered
+                                                                  // int field
     }
 
     private void inferFieldsFromHeader(Iterator<String[]> iterator) throws IOException {
@@ -255,8 +277,10 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
                             if(intValue != null) {
                                 addTerm(field.getName(), intValue);
                             } else {
-                                addTerm(field.getName(), 0);
-                                field.incrementIllegalIntValue();
+                                // don't index non-int values at all
+                                if (!value.isEmpty()) {
+                                    field.incrementIllegalIntValue();
+                                }
                             }
                         } else {    // string term
                             if(field.isIdxFullField()) {
