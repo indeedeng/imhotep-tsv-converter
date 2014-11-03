@@ -160,7 +160,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
      * 10% other strings and the rest can be either ints or blanks.
      */
     private static boolean isIntField(int intValCount, int blankValCount, int rowCount) {
-        if (intValCount < rowCount / 20) {
+        if (intValCount < Math.ceil(rowCount / 20)) {
             // there are under 20% ints, so consider it a string field
             return false;
         }
