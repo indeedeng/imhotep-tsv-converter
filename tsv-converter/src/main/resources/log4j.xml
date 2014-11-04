@@ -4,7 +4,7 @@
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 
     <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File"   value="/opt/imhotepShardBuilder/logs/shardBuilder.log" />
+        <param name="File"   value="/opt/imhotepTsvConverter/logs/shardBuilder.log" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <param name="BufferedIO" value="false" />
         <param name="Append" value="true" />
@@ -15,7 +15,7 @@
     </appender>
 
     <appender name="ERRORLOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/opt/imhotepShardBuilder/logs/shardBuilder-error.log" />
+        <param name="File" value="/opt/imhotepTsvConverter/logs/shardBuilder-error.log" />
         <param name="DatePattern" value="'.'yyyy-MM" />
         <param name="BufferedIO" value="false" />
         <param name="Append" value="true" />
