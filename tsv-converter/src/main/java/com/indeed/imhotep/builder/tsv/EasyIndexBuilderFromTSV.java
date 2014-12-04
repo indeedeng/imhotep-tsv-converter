@@ -78,7 +78,11 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         final BufferedReader fileReader = getInputFileReader(inputFile);
         final String fileName = inputFile.getName();
         if(fileName.endsWith(".csv") || fileName.endsWith(".csv.gz")) {
-            return new CSVInputReader(fileReader);
+            try {
+                return new CSVInputReader(fileReader);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             // Should we also using the escaped TSV in some situations? What would be the trigger?
             return new TSVInputReaderNoEscaping(fileReader);

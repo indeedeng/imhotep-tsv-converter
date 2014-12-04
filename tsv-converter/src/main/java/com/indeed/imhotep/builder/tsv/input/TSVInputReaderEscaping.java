@@ -13,6 +13,7 @@
  */
  package com.indeed.imhotep.builder.tsv.input;
 
+import java.io.IOException;
 import java.io.Reader;
 
 /**
@@ -20,7 +21,7 @@ import java.io.Reader;
  */
 
 public class TSVInputReaderEscaping extends CSVInputReader {
-    public TSVInputReaderEscaping(Reader fileReader) {
+    public TSVInputReaderEscaping(Reader fileReader) throws IOException {
         super(fileReader, '\t');
     }
 }

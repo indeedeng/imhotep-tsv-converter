@@ -13,11 +13,12 @@
  */
  package com.indeed.imhotep.builder.tsv.input;
 
-import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVReader;
-import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import com.indeed.util.core.io.Closeables2;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -31,39 +32,49 @@ import java.util.Iterator;
 public class CSVInputReader implements InputReader {
     private static final Logger log = Logger.getLogger(CSVInputReader.class);
 
-    private final CSVReader reader;
+    private final CSVParser parser;
+    private final Iterator<CSVRecord> iter;
 
-    public CSVInputReader(Reader fileReader, char separator) {
+    public CSVInputReader(Reader fileReader, char separator) throws IOException {
         final boolean ignoreLeadingWhitespace = false;
-        reader = new CSVReader(fileReader, separator, CSVParser.DEFAULT_QUOTE_CHARACTER,
-                CSVParser.DEFAULT_ESCAPE_CHARACTER, CSVReader.DEFAULT_SKIP_LINES, CSVParser.DEFAULT_STRICT_QUOTES, ignoreLeadingWhitespace);
+        final CSVFormat csvFormat;
+
+        csvFormat = CSVFormat.DEFAULT
+                .withAllowMissingColumnNames(false)
+                .withRecordSeparator(separator)
+                .withRecordSeparator('\n')
+                .withEscape('\\')
+                .withIgnoreSurroundingSpaces(ignoreLeadingWhitespace)
+                .withIgnoreEmptyLines(false);
+        this.parser = csvFormat.parse(fileReader);
+        this.iter = this.parser.iterator();
     }
 
-    public CSVInputReader(Reader fileReader) {
+    public CSVInputReader(Reader fileReader) throws IOException {
         this(fileReader, ',');
     }
 
-    public Iterator<String[]> iterator() {
+    public final Iterator<String[]> iterator() {
         return new AbstractIterator<String[]>() {
             protected String[] computeNext() {
-                final String[] next;
-                try {
-                    next = reader.readNext();
-                } catch (IOException e) {
-                    throw Throwables.propagate(e);
-                }
-                if(next == null) {
-                    Closeables2.closeQuietly(reader, log);
+
+                if (! iter.hasNext()) {
+                    Closeables2.closeQuietly(parser, log);
                     return endOfData();
                 }
-
+                
+                final CSVRecord rec = iter.next();
+                final String[] next = new String[rec.size()];
+                for (int i = 0; i < rec.size(); i++) {
+                    next[i] = rec.get(i);
+                }
                 return next;
             }
         };
     }
 
     @Override
-    public void close() {
-        Closeables2.closeQuietly(reader, log);
+    public final void close() {
+        Closeables2.closeQuietly(parser, log);
     }
 }
