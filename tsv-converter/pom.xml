@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.indeed</groupId>
 		<artifactId>imhotep-tsv-converter</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tsv-builder</artifactId>
@@ -55,6 +55,24 @@
 			<groupId>com.indeed</groupId>
 			<artifactId>imhotep-server</artifactId>
 			<version>${imhotep-server.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-app</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-api</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 
 		<dependency>
@@ -66,7 +84,7 @@
 		<dependency>
 			<groupId>com.indeed</groupId>
 			<artifactId>index-builder-util</artifactId>
-			<version>${index-builder-util.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -74,7 +92,7 @@
 			<artifactId>hadoop-hdfs</artifactId>
 			<version>2.0.0-cdh4.4.0</version>
 		</dependency>
-    
+
         <!-- Hadoop for caching -->
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
@@ -117,11 +135,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
@@ -136,8 +149,7 @@
 	<properties>
 		<joda-time.version>2.0</joda-time.version>
 		<util-core.version>[1.0.10,)</util-core.version>
-		<index-builder-util.version>[1.0.0,)</index-builder-util.version>
-		<imhotep-server.version>[1.0.3-SNAPSHOT,)</imhotep-server.version>
+		<imhotep-server.version>[1.0.4-SNAPSHOT,)</imhotep-server.version>
 	</properties>
 
 </project>

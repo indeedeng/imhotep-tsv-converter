@@ -4,13 +4,12 @@
 
 	<parent>
 		<groupId>com.indeed</groupId>
-        <artifactId>imhotep-tsv-converter</artifactId>
-        <version>1.0.0</version>
+		<artifactId>imhotep-tsv-converter</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>index-builder-util</artifactId>
 	<name>Imhotep Index Builder Utilities</name>
-	<version>1.0.0</version>
 	<description>
         Abstract framework for imhotep index builders
     </description>
