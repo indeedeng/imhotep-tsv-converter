@@ -74,7 +74,7 @@ public class TsvConverter {
     private static final DateTimeFormatter yyyymmdddothh = DateTimeFormat.forPattern("yyyyMMdd.HH");
     private static final DateTimeFormatter yyyymmddhhmmss = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_KEYTAB_PATH = "/etc/krb5.keytab";
-    private static int PARALLEL_BUILDS = 4;
+    private static int DEFUALT_PARALLEL_BUILDS = 4;
 
     private static boolean DEBUG_BUILD_ONE = false;
 
@@ -98,9 +98,14 @@ public class TsvConverter {
     Configuration hdfsConf;
     final ExecutorService executor;
 
-    public TsvConverter() {
+    public TsvConverter(int numParallelBuilds) {
+        
+        if (numParallelBuilds <= 0) {
+            numParallelBuilds = DEFUALT_PARALLEL_BUILDS;
+        }
+
         executor =
-                new ThreadPoolExecutor(PARALLEL_BUILDS, 10, 30, TimeUnit.SECONDS,
+                new ThreadPoolExecutor(numParallelBuilds, 32, 30, TimeUnit.SECONDS,
                                        new LinkedBlockingQueue<Runnable>(10000),
                                        new NamedThreadFactory("Builder", true));
     }
@@ -596,7 +601,7 @@ public class TsvConverter {
         }
         
         /* start up the shard builder */
-        final TsvConverter converter = new TsvConverter();
+        final TsvConverter converter = new TsvConverter(0);
         converter.init(cmd.getOptionValue('i'),
                        cmd.getOptionValue('s'),
                        cmd.getOptionValue('f'),
