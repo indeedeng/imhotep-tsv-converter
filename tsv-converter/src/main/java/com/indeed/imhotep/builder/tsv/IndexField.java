@@ -26,15 +26,21 @@ public class IndexField {
     private final String nameTokenized;
     private final String nameBigram;
     private int illegalIntValues = 0;
+    private final Analyzer analyzer;
 
 
-    public IndexField(String name, boolean tokenized, boolean bigram, boolean idxFullField) {
+    public IndexField(final String name, final boolean tokenized, final boolean bigram, final boolean idxFullField,
+                      @Nullable final Character delimeter) {
         this.name = name;
         nameTokenized = name + "tok";
         nameBigram = name + "bigram";
         this.tokenized = tokenized;
         this.bigram = bigram;
         this.idxFullField = idxFullField;
+
+        if(delimeter != null) {
+            analyzer = new ArbitraryCharAnalyzer(delimeter);
+        }
     }
 
     public String getName() {
@@ -63,6 +69,10 @@ public class IndexField {
 
     public boolean isIntField() {
         return isIntField;
+    }
+
+    public Analyzer getAnalyzer() {
+        return analyzer;
     }
 
     public void setIntField(boolean intField) {

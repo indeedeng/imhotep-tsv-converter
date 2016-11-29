@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 public interface IndexWriter {
 
     public void addTerm(@Nonnull String fieldName, @Nonnull String stringTerm, boolean tokenized);
+    public void addTerm(@Nonnull String fieldName, @Nonnull String stringTerm, @Nonnull Analyzer overrideAnalyzer);
     public void addTerm(@Nonnull String fieldName, long numTerm);
     public void addBigramTerm(@Nonnull String fieldName, @Nonnull String stringTerm);
 
