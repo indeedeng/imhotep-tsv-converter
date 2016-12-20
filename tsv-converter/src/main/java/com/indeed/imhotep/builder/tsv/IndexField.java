@@ -13,6 +13,9 @@
  */
  package com.indeed.imhotep.builder.tsv;
 
+import com.sun.istack.internal.Nullable;
+import org.apache.lucene.analysis.Analyzer;
+
 /**
  * @author vladimir
  */
@@ -40,6 +43,8 @@ public class IndexField {
 
         if(delimeter != null) {
             analyzer = new ArbitraryCharAnalyzer(delimeter);
+        } else {
+            analyzer = null;
         }
     }
 

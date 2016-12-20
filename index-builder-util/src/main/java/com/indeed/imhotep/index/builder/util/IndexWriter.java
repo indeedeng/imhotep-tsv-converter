@@ -11,9 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.indeed.imhotep.index.builder.util;
+package com.indeed.imhotep.index.builder.util;
 
 import javax.annotation.Nonnull;
+import org.apache.lucene.analysis.Analyzer;
 
 /**
  * Abstracts creating an inverted index e.g. in Lucene or Flamdex format.

@@ -2,6 +2,8 @@ package com.indeed.imhotep.builder.tsv;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharTokenizer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,14 +19,14 @@ public class ArbitraryCharAnalyzer extends Analyzer {
     }
 
     public TokenStream tokenStream(final String fieldName, final Reader reader) {
-        return new ArbitraryCharTokenizer(reader);
+        return new ArbitraryCharTokenizer(reader, delimeter);
     }
 
     // Copied from {@link WhitespaceAnalyzer}
     public TokenStream reusableTokenStream(final String fieldName, final Reader reader) throws IOException {
-        final Tokenizer tokenizer = (Tokenizer) getPreviousTokenStream();
+        Tokenizer tokenizer = (Tokenizer) getPreviousTokenStream();
         if (tokenizer == null) {
-            tokenizer = new ArbitraryCharTokenizer(reader);
+            tokenizer = new ArbitraryCharTokenizer(reader, delimeter);
             setPreviousTokenStream(tokenizer);
         } else {
             tokenizer.reset(reader);
