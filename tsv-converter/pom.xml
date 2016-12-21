@@ -137,7 +137,7 @@
 		<joda-time.version>2.0</joda-time.version>
 		<util-core.version>[1.0.10,)</util-core.version>
 		<index-builder-util.version>[1.0.0,)</index-builder-util.version>
-		<imhotep-server.version>[1.0.3-SNAPSHOT,)</imhotep-server.version>
+		<imhotep-server.version>1.0.10-SNAPSHOT</imhotep-server.version>
 	</properties>
 
 </project>
