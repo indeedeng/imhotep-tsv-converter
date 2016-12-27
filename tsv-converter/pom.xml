@@ -111,6 +111,12 @@
 			<version>2.3</version>
 		</dependency>
 
+                <dependency>
+                        <groupId>org.apache.lucene</groupId>
+                        <artifactId>lucene-core</artifactId>
+                        <version>${lucene.version}</version>
+                </dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -135,6 +141,7 @@
 
 	<properties>
 		<joda-time.version>2.0</joda-time.version>
+                <lucene.version>2.4.1</lucene.version>
 		<util-core.version>1.0.23</util-core.version>
 		<index-builder-util.version>1.0.0</index-builder-util.version>
 		<imhotep-server.version>1.0.10-SNAPSHOT</imhotep-server.version>
