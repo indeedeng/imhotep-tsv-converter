@@ -5,6 +5,8 @@ jdk:
 script: mvn install
 
 install:
+    - wget https://s3-us-west-2.amazonaws.com/imhotep-build/imhotep.pom
+    - mvn install:install-file -Dfile=imhotep.pom -DgroupId=com.indeed -DartifactId=imhotep -Dversion=1.0.10-SNAPSHOT -Dpackaging=xml -DpomFile=imhotep.pom
     - IMHOTEP_SERVER_JAR=`curl -s https://s3-us-west-2.amazonaws.com/imhotep-build/ | egrep -o "imhotep-server-[0-9\.]+-SNAPSHOT.jar" | head -1`
     - wget https://s3-us-west-2.amazonaws.com/imhotep-build/$IMHOTEP_SERVER_JAR
     - wget https://s3-us-west-2.amazonaws.com/imhotep-build/imhotep-server.pom
@@ -21,6 +23,7 @@ install:
 before_deploy:
     - mkdir deploy
     - cp */target/*builder*.* deploy/
+    - cp pom.xml deploy/imhotep-tsv-converter.pom
     - cp index-builder-util/pom.xml deploy/index-builder-util.pom
     - cp tsv-converter/pom.xml deploy/tsv-converter.pom
 
