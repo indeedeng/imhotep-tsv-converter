@@ -1,0 +1,19 @@
+language: java
+jdk:
+    - oraclejdk7
+
+script: mvn install
+
+install:
+    - IMHOTEP_SERVER_JAR=`curl -s https://s3-us-west-2.amazonaws.com/imhotep-build/ | egrep -o "indeedeng[^<]*imhotep-server-[0-9\.]+-SNAPSHOT.jar"`
+    - wget https://s3-us-west-2.amazonaws.com/imhotep-build/$IMHOTEP_SERVER_JAR
+    - mvn install:install-file -Dfile=imhotep-server-1.0.10-SNAPSHOT.jar -DgroupId=com.indeed -DartifactId=imhotep-server -Dversion=1.0.10-SNAPSHOT -Dpackaging=jar
+    - IMHOTEP_ARCHIVE_JAR=`curl -s https://s3-us-west-2.amazonaws.com/imhotep-build/ | egrep -o "indeedeng[^<]*imhotep-archive-[0-9\.]+-SNAPSHOT.jar"`
+    - wget https://s3-us-west-2.amazonaws.com/imhotep-build/$IMHOTEP_ARCHIVE_JAR
+    - mvn install:install-file -Dfile=imhotep-archive-1.0.10-SNAPSHOT.jar -DgroupId=com.indeed -DartifactId=imhotep-archive -Dversion=1.0.10-SNAPSHOT -Dpackaging=jar
+
+addons:
+    artifacts:
+        s3_region: "us-west-2"
+        paths:
+        - $(git ls-files -o */target/*builder*.* | tr "\n" ":")
