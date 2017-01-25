@@ -1,0 +1,26 @@
+language: java
+jdk:
+    - oraclejdk7
+
+script: mvn install
+
+install:
+    - wget https://s3-us-west-2.amazonaws.com/indeedeng-imhotep-build/install-imhotep-maven-local.sh 
+    - bash install-imhotep-maven-local.sh
+
+before_deploy:
+    - mkdir deploy
+    - cp */target/*builder*.* deploy/
+    - cp pom.xml deploy/imhotep-tsv-converter.pom
+    - cp index-builder-util/pom.xml deploy/index-builder-util.pom
+    - cp tsv-converter/pom.xml deploy/tsv-converter.pom
+
+deploy:
+    provider: s3
+    access_key_id: AKIAJVZNZT5TTB2Y4BNA
+    secret_access_key:
+      secure: INvYKFi4Y6bILOL/myDzUC3cL4S/COisntrAirrpVG1Mw8+YawaYDErtJO6VZ7/zK2VyWV//WAJ8c1uq4T7Kq2U+FNTcn7NY5azDEb5BWS7dB4HWxvAI8gxCJcW4fGaEdG8C9FGty41GeDGDO8W5IoE3tHCPkWJfLGmnJC/4pEs=
+    bucket: indeedeng-imhotep-build
+    local-dir: deploy
+    skip_cleanup: true
+    region: us-west-2
