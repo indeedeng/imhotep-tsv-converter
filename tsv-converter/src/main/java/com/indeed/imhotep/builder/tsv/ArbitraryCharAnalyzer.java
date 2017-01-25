@@ -43,8 +43,8 @@ public class ArbitraryCharAnalyzer extends Analyzer {
         }
 
         @Override
-        protected boolean isTokenChar(char c) {
-            return c == delimeter;
+        protected boolean isTokenChar(final char c) {
+            return c != delimeter;
         }
     }
 }
