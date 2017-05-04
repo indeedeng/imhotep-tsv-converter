@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.indeed</groupId>
 		<artifactId>imhotep-tsv-converter</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tsv-builder</artifactId>
@@ -84,21 +84,21 @@
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-hdfs</artifactId>
-			<version>2.0.0-cdh4.4.0</version>
+			<version>2.6.0-cdh5.4.7</version>
 		</dependency>
     
         <!-- Hadoop for caching -->
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>
-			<version>2.0.0-cdh4.4.0</version>
+			<version>2.6.0-cdh5.4.7</version>
 		</dependency>
 
         <!-- Needed to replace dep in hadoop on a broken version -->
 		<dependency>
 			<groupId>net.java.dev.jets3t</groupId>
 			<artifactId>jets3t</artifactId>
-			<version>0.7.1</version>
+			<version>0.9.0</version>
 		</dependency>
 
 		<dependency>
@@ -155,8 +155,8 @@
 		<joda-time.version>2.0</joda-time.version>
 		<lucene.version>2.4.1</lucene.version>
 		<util-core.version>1.0.23</util-core.version>
-		<index-builder-util.version>1.0.0</index-builder-util.version>
-		<imhotep.version>1.0.76</imhotep.version>
+		<index-builder-util.version>1.0.1-SNAPSHOT</index-builder-util.version>
+		<imhotep.version>1.0.11-SNAPSHOT</imhotep.version>
 	</properties>
 
 </project>
