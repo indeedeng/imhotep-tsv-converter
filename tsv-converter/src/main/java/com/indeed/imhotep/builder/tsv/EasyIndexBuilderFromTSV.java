@@ -184,17 +184,26 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
             boolean tokenized = false;
             boolean bigram = false;
             boolean idxFullField = true;
+            Character delimeter = null;
             if(field.endsWith("**")) {
                 bigram = true;
                 tokenized = true;
                 idxFullField = true;
-                field = field.substring(0, field.length()-2);
+                field = field.substring(0, field.length()-1);
             } else if(field.endsWith("*")) {
                 bigram = false;
                 tokenized = true;
                 idxFullField = true;
+                // No need to set the delimeter here, that's only for non-standard (i.e., non-whitespace)
                 field = field.substring(0, field.length()-1);
-            } else if(field.endsWith("+")) {
+            } else if(field.endsWith("*|")) {
+                bigram = false;
+                tokenized = true;
+                idxFullField = false;
+                delimeter = '|';
+                field = field.substring(0, field.length()-1);
+            }
+            else if(field.endsWith("+")) {
                 bigram = false;
                 tokenized = true;
                 field = field.substring(0, field.length()-1);
@@ -203,7 +212,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
 
             validateFieldName(field);
 
-            final IndexField indexField = new IndexField(field, tokenized, bigram, idxFullField);
+            final IndexField indexField = new IndexField(field, tokenized, bigram, idxFullField, delimeter);
             indexFields[i] = indexField;
             if("time".equals(field) || "unixtime".equals(field)) {
                 timeFieldIndex = i;
@@ -292,7 +301,11 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
                                  */
                                 String fn = field.isIdxFullField() ? field.getNameTokenized()
                                                                    : field.getName();
-                                addTerm(fn, value, true);
+                                if(field.getAnalyzer() != null) {
+                                    addTerm(fn, value, field.getAnalyzer());
+                                } else {
+                                    addTerm(fn, value, true);
+                                }
                             }
                             if(field.isBigram()) {
                                 addBigramTerm(field.getNameBigram(), value);

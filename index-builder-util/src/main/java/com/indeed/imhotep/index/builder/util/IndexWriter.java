@@ -11,9 +11,10 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.indeed.imhotep.index.builder.util;
+package com.indeed.imhotep.index.builder.util;
 
 import javax.annotation.Nonnull;
+import org.apache.lucene.analysis.Analyzer;
 
 /**
  * Abstracts creating an inverted index e.g. in Lucene or Flamdex format.
@@ -22,6 +23,7 @@ import javax.annotation.Nonnull;
 public interface IndexWriter {
 
     public void addTerm(@Nonnull String fieldName, @Nonnull String stringTerm, boolean tokenized);
+    public void addTerm(@Nonnull String fieldName, @Nonnull String stringTerm, @Nonnull Analyzer overrideAnalyzer);
     public void addTerm(@Nonnull String fieldName, long numTerm);
     public void addBigramTerm(@Nonnull String fieldName, @Nonnull String stringTerm);
 
