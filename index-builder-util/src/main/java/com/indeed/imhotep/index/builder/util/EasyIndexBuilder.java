@@ -15,6 +15,7 @@
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.joda.time.DateTimeZone;
 
 import java.io.File;
@@ -169,6 +170,10 @@ public abstract class EasyIndexBuilder implements Bootable {
      */
     final protected void addTerm(String fieldName, String term, boolean tokenized) {
         indexWriter.addTerm(fieldName, term, tokenized);
+    }
+
+    final protected void addTerm(String fieldName, String term, Analyzer analyzer) {
+        indexWriter.addTerm(fieldName, term, analyzer);
     }
 
     final protected void addBigramTerm(String fieldName, String term) {

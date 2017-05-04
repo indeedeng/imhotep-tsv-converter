@@ -13,8 +13,9 @@
  */
  package com.indeed.imhotep.builder.tsv;
 
-import com.sun.istack.internal.Nullable;
 import org.apache.lucene.analysis.Analyzer;
+
+import javax.annotation.Nullable;
 
 /**
  * @author vladimir
