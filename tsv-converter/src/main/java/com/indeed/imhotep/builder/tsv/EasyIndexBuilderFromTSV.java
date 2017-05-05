@@ -199,7 +199,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
             } else if(field.endsWith("*|")) {
                 bigram = false;
                 tokenized = true;
-                idxFullField = false;
+                idxFullField = true;
                 delimeter = '|';
                 field = field.substring(0, field.length()-2);
             }
