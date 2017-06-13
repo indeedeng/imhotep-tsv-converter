@@ -50,7 +50,8 @@ public class TSVInputReaderNoEscaping implements InputReader {
                     return endOfData();
                 }
 
-                return nextLine.split("\t");
+                // limit=-1 preserves the empty value after the trailing \t
+                return nextLine.split("\t", -1);
             }
         };
     }
