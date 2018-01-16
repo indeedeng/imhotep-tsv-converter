@@ -258,7 +258,7 @@ public class TsvConverter {
                     }
 
                     final String scheme = finalFS.getUri().getScheme();
-                    if(scheme.equals("hdfs") || scheme.equals("s3n")) {
+                    if(scheme.equals("hdfs") || scheme.equals("s3n") || scheme.equals("s3a")) {
                         final boolean uploadSucceeded =
                                 uploadShard(localShardDirWithTimestamp.getParent(),
                                             localShardDirWithTimestamp.getName(),
@@ -482,7 +482,7 @@ public class TsvConverter {
                 writer.batchAppendDirectory(shardDir);
                 writer.commit();
                 finalFS.rename(tempUploadPath, finalShardPath);
-            } else if (scheme.equals("s3n")) {
+            } else if (scheme.equals("s3n") || scheme.equals("s3a")) {
                 /* 
                  * s3 files are only visible after the upload is complete,
                  * so no need to use a temp file

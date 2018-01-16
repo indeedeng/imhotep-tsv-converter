@@ -340,7 +340,9 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         if(Strings.isNullOrEmpty(inputFilePath)) {
             throw new RuntimeException("Expecting extra arg to be the HDFS path of the TSV input file.");
         }
-        if (!inputFilePath.startsWith("hdfs:") && !inputFilePath.startsWith("s3n:")
+        if (!inputFilePath.startsWith("hdfs:") 
+                && !inputFilePath.startsWith("s3n:")
+                && !inputFilePath.startsWith("s3a:")
                 && !inputFilePath.startsWith("file:")) {
             inputFilePath = "file:" + inputFilePath;
         }
