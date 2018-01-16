@@ -92,6 +92,11 @@ public class FlamdexIndexWriter implements IndexWriter {
     }
 
     @Override
+    public void addTerm(@Nonnull String fieldName, @Nonnull String stringTerm, @Nonnull Analyzer overrideAnalyzer) {
+        flamdexDocument.addStringTerms(fieldName, tokenize(stringTerm, overrideAnalyzer));
+    }
+
+    @Override
     public void addTerm(@Nonnull String fieldName, long numTerm) {
         flamdexDocument.addIntTerm(fieldName, numTerm);
     }
