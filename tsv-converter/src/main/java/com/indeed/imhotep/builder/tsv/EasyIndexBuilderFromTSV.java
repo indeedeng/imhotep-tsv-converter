@@ -58,7 +58,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
     protected long endTimestampMS;
     protected IndexField[] indexFields;
     protected boolean PRODUCE_FLAMDEX = true;
-    int rowCount = 0;
+    private static int INVALID_TIMESTAMP_WARNINGS_PRINT_MAX = 5;
 
     @Override
     protected void setup() {
@@ -119,12 +119,16 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         if(!iterator.hasNext()) {
             throw new RuntimeException("No data is available in the input file. At least one line of data past the header is required");
         }
+        int rowCount = 0;
         log.info("Scanning the file to detect int fields");
         while(iterator.hasNext()) {
             final String[] values = iterator.next();
             final int valueCount = Math.min(values.length, indexFields.length);
             rowCount++;
             for(int i = 0; i < valueCount; i++) {
+                if(indexFields[i].isFieldTypeGuaranteed()) {
+                    continue;   // we have a guaranteed type. skip detection
+                }
                 if(!isInt[i]) {
                     continue;   // we already know this is not an integer
                 }
@@ -143,6 +147,9 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         int intFieldCount = 0;
         List<String> intFields = Lists.newArrayList();
         for(int i = 0; i < indexFields.length; i++) {
+            if(indexFields[i].isFieldTypeGuaranteed()) {
+                continue;
+            }
             boolean isIntField = isInt[i] && isIntField(intValCount[i], blankValCount[i], rowCount);
             if(isIntField) {
                 intFields.add(indexFields[i].getName());
@@ -160,12 +167,12 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
      * 10% other strings and the rest can be either ints or blanks.
      */
     private static boolean isIntField(int intValCount, int blankValCount, int rowCount) {
-        if (intValCount < Math.ceil(rowCount / 20)) {
+        if (intValCount < rowCount / 10.0 * 2) {
             // there are under 20% ints, so consider it a string field
             return false;
         }
         // we have a good number of int values, consider blanks to be 0s
-        return (intValCount + blankValCount) > rowCount / 10 * 9; // require
+        return (intValCount + blankValCount) > rowCount / 10.0 * 9; // require
                                                                   // over 90%
                                                                   // fit to be
                                                                   // considered
@@ -185,6 +192,7 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
             boolean bigram = false;
             boolean idxFullField = true;
             Character delimeter = null;
+            FieldType fieldType = null;
             if(field.endsWith("**")) {
                 bigram = true;
                 tokenized = true;
@@ -210,9 +218,21 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
                 idxFullField = false;
             }
 
+            // Allow for strong typing to override type inference
+            final String[] wordsInFieldName = field.split(" ");
+            if(wordsInFieldName.length == 2) {
+                if (wordsInFieldName[0].equals("string")) {
+                    fieldType = FieldType.STRING;
+                    field = wordsInFieldName[1];
+                } else if(wordsInFieldName[0].equals("int")) {
+                    fieldType = FieldType.INT;
+                    field = wordsInFieldName[1];
+                }
+            }
+
             validateFieldName(field);
 
-            final IndexField indexField = new IndexField(field, tokenized, bigram, idxFullField, delimeter);
+            final IndexField indexField = new IndexField(field, tokenized, bigram, idxFullField, delimeter, fieldType);
             indexFields[i] = indexField;
             if("time".equals(field) || "unixtime".equals(field)) {
                 timeFieldIndex = i;
@@ -251,9 +271,13 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
         final InputReader reader = getInputReader();
         try {
             Iterator<String[]> iterator = reader.iterator();
+            int rowNumber = 0;
             iterator.next();  // skip header
+            rowNumber++;
+            int rowsWithInvalidTimestamp = 0;
             while(iterator.hasNext()) {
                 final String[] values = iterator.next();
+                rowNumber++;
                 final int valueCount = Math.min(values.length, indexFields.length);
                 if(valueCount != indexFields.length) {
                     // inconsistent number of columns detected
@@ -275,8 +299,14 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
 //                            log.warn("Illegal timestamp: " + value);
                             continue;
                         }
-                        if(timestamp < startTimestampMS || timestamp > endTimestampMS) {  // should this be inclusive of endTS?
-                            log.warn("Timestamp outside range: " + timestamp + ". Should be between: " + startTimestampMS + " and " + endTimestampMS);
+                        if(timestamp < startTimestampMS || timestamp >= endTimestampMS) {
+                            rowsWithInvalidTimestamp++;
+                            if(rowsWithInvalidTimestamp <= INVALID_TIMESTAMP_WARNINGS_PRINT_MAX) {
+                                log.warn("Timestamp outside range: " + timestamp + ". Should be between: " + startTimestampMS + " and " + endTimestampMS);
+                            }
+                            if (rowsWithInvalidTimestamp == INVALID_TIMESTAMP_WARNINGS_PRINT_MAX) {
+                                log.warn("Further warnings for invalid timestamps will be muted");
+                            }
                             continue;
                         }
                         docTimestamp = timestamp;
@@ -289,6 +319,10 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
                                 // don't index non-int values at all
                                 if (!value.isEmpty()) {
                                     field.incrementIllegalIntValue();
+                                    if(field.isFieldTypeGuaranteed()) {
+                                        throw new RuntimeException("Found value that can't be parsed as Long in an " +
+                                                "'int' field '" + field.getName() + "' on row " + rowNumber + ": " + value);
+                                    }
                                 }
                             }
                         } else {    // string term
@@ -319,8 +353,12 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
             for(IndexField field : indexFields) {
                 int badIntVals = field.getIllegalIntValues();
                 if(badIntVals > 0) {
-                    log.warn("Column " + field.getName() + " had " + badIntVals + " (" + badIntVals * 100 / rowCount + "%) illegal int values");
+                    log.warn("Column " + field.getName() + " had " + badIntVals + " (" + badIntVals * 100 / rowNumber + "%) illegal int values");
                 }
+            }
+            if(rowsWithInvalidTimestamp > 0) {
+                log.warn("Timestamp column " + indexFields[timeFieldIndex].getName() + " had " + rowsWithInvalidTimestamp +
+                        " invalid values");
             }
         } finally {
             Closeables2.closeQuietly(reader, log);

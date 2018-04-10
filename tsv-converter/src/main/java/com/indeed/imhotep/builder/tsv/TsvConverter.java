@@ -68,13 +68,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TsvConverter {
     static final Logger log = Logger.getLogger(TsvConverter.class);
     private static final List<String> ALLOWED_FILE_EXT = Lists.newArrayList(".tsv", ".tsv.gz", ".csv", ".csv.gz");
-    private static final String ALLOWED_INDEX_NAMES = "[a-z0-9]+";
+    private static final String ALLOWED_INDEX_NAMES = "[a-z][a-zA-Z0-9]*";
     private static final DateTimeFormatter yyyymmdd = DateTimeFormat.forPattern("yyyyMMdd");
     private static final DateTimeFormatter yyyymmddhh = DateTimeFormat.forPattern("yyyyMMdd.HH");
     private static final DateTimeFormatter yyyymmdddothh = DateTimeFormat.forPattern("yyyyMMdd.HH");
     private static final DateTimeFormatter yyyymmddhhmmss = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_KEYTAB_PATH = "/etc/krb5.keytab";
-    private static int PARALLEL_BUILDS = 4;
+    private static int DEFAULT_PARALLEL_BUILDS = 4;
 
     private static boolean DEBUG_BUILD_ONE = false;
 
@@ -96,13 +96,9 @@ public class TsvConverter {
     FileSystem finalFS;
     boolean qaMode;
     Configuration hdfsConf;
-    final ExecutorService executor;
+    ExecutorService executor;
 
     public TsvConverter() {
-        executor =
-                new ThreadPoolExecutor(PARALLEL_BUILDS, 10, 30, TimeUnit.SECONDS,
-                                       new LinkedBlockingQueue<Runnable>(10000),
-                                       new NamedThreadFactory("Builder", true));
     }
 
     public void init(String indexDir,
@@ -112,7 +108,8 @@ public class TsvConverter {
                      String buildDir,
                      String principal,
                      String keytab,
-                     boolean qa) {
+                     boolean qa,
+                     String parallelBuildsString) {
         if (Strings.isNullOrEmpty(indexDir) 
                 || Strings.isNullOrEmpty(successDir)
                 || Strings.isNullOrEmpty(shardDir)
@@ -127,6 +124,18 @@ public class TsvConverter {
         finalShardDir = shardDir;
         qaMode = qa;
 
+        final int parallelBuilds;
+        try {
+            parallelBuilds = Integer.parseInt(parallelBuildsString);
+        } catch (Exception e) {
+            log.error("Argument to 'parallel-builds' must be a positive integer. Given: " + parallelBuildsString);
+            System.exit(-1);
+            return;
+        }
+        executor = new ThreadPoolExecutor(
+                parallelBuilds, 10, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(10000),
+                new NamedThreadFactory("Builder"));
+
         if (toIndexDir.startsWith("hdfs:") 
                 || processedSuccessDir.startsWith("hdfs:")
                 || finalShardDir.startsWith("hdfs")) {
@@ -140,7 +149,8 @@ public class TsvConverter {
         processedSuccessPath = inputFS.makeQualified(new Path(processedSuccessDir));
         processedFailedPath = inputFS.makeQualified(new Path(processedFailedDir));
         finalShardPath = finalFS.makeQualified(new Path(finalShardDir));
-        
+
+        // TODO: delete on completion?
         localBuildDir = (buildDir == null) ? Files.createTempDir() : new File(buildDir);
 
         for(Path path : Lists.newArrayList(toIndexPath, processedSuccessPath, processedFailedPath, finalShardPath)) {
@@ -584,6 +594,11 @@ public class TsvConverter {
                 .withDescription("Enable QA mode")
                 .create('q');
         options.addOption(qaMode);
+        final Option parallelBuilds = OptionBuilder
+                .hasArg()
+                .withDescription("Number of shards to build in parallel (default " + DEFAULT_PARALLEL_BUILDS + ")")
+                .create("parallel-builds");
+        options.addOption(parallelBuilds);
         
         try{
             cmd = parser.parse(options, args);
@@ -604,7 +619,8 @@ public class TsvConverter {
                        cmd.getOptionValue('b'),
                        cmd.getOptionValue('p'),
                        cmd.getOptionValue('k'),
-                       cmd.hasOption('q'));
+                       cmd.hasOption('q'),
+                       cmd.getOptionValue("parallel-builds", String.valueOf(DEFAULT_PARALLEL_BUILDS)) );
         
         converter.run();
     }

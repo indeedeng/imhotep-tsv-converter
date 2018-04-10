@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>com.indeed</groupId>
 			<artifactId>index-builder-util</artifactId>
-			<version>${index-builder-util.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -155,7 +155,6 @@
 		<joda-time.version>2.0</joda-time.version>
 		<lucene.version>2.4.1</lucene.version>
 		<util-core.version>1.0.23</util-core.version>
-		<index-builder-util.version>1.0.1-SNAPSHOT</index-builder-util.version>
 		<imhotep.version>1.0.11-SNAPSHOT</imhotep.version>
 	</properties>
 

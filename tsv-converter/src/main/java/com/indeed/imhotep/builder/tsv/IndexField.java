@@ -26,7 +26,8 @@ public class IndexField {
     private boolean tokenized;
     private boolean bigram;
     private boolean idxFullField;
-    private boolean isIntField;
+    private FieldType fieldType;
+    private boolean fieldTypeGuaranteed;
     private final String nameTokenized;
     private final String nameBigram;
     private int illegalIntValues = 0;
@@ -34,13 +35,15 @@ public class IndexField {
 
 
     public IndexField(final String name, final boolean tokenized, final boolean bigram, final boolean idxFullField,
-                      @Nullable final Character delimeter) {
+                      @Nullable final Character delimeter, FieldType fieldType) {
         this.name = name;
         nameTokenized = name + "tok";
         nameBigram = name + "bigram";
         this.tokenized = tokenized;
         this.bigram = bigram;
         this.idxFullField = idxFullField;
+        this.fieldType = fieldType;
+        this.fieldTypeGuaranteed = fieldType != null;
 
         if(delimeter != null) {
             analyzer = new ArbitraryCharAnalyzer(delimeter);
@@ -73,16 +76,20 @@ public class IndexField {
         return idxFullField;
     }
 
-    public boolean isIntField() {
-        return isIntField;
-    }
-
     public Analyzer getAnalyzer() {
         return analyzer;
     }
 
+    public boolean isIntField() {
+        return fieldType == FieldType.INT;
+    }
+
     public void setIntField(boolean intField) {
-        isIntField = intField;
+        fieldType = intField ? FieldType.INT : FieldType.STRING;
+    }
+
+    public boolean isFieldTypeGuaranteed() {
+        return fieldTypeGuaranteed;
     }
 
     public void incrementIllegalIntValue() {
