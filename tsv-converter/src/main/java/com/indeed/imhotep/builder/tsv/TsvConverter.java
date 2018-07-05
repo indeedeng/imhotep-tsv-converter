@@ -597,7 +597,7 @@ public class TsvConverter {
         final Option parallelBuilds = OptionBuilder
                 .hasArg()
                 .withDescription("Number of shards to build in parallel (default " + DEFAULT_PARALLEL_BUILDS + ")")
-                .create("parallel-builds");
+                .create("parallelbuilds");
         options.addOption(parallelBuilds);
         
         try{
