@@ -134,7 +134,7 @@ public class TsvConverter {
         }
         executor = new ThreadPoolExecutor(
                 parallelBuilds, 10, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(10000),
-                new NamedThreadFactory("Builder"));
+                new NamedThreadFactory("Builder", true));
 
         if (toIndexDir.startsWith("hdfs:") 
                 || processedSuccessDir.startsWith("hdfs:")
@@ -546,35 +546,35 @@ public class TsvConverter {
         final Option idxLoc = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withLongOpt("index-loc")
-                .withDescription("")
+                .withDescription("Location of TSVs to build")
                 .isRequired()
                 .create('i');
         options.addOption(idxLoc);
         final Option successLoc = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withLongOpt("success-loc")
-                .withDescription("")
+                .withDescription("Where to move TSVs that built successfully")
                 .isRequired()
                 .create('s');
         options.addOption(successLoc);
         final Option failureLoc = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withLongOpt("failure-loc")
-                .withDescription("")
+                .withDescription("Where to move TSVs that failed to build")
                 .isRequired()
                 .create('f');
         options.addOption(failureLoc);
         final Option dataLoc = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withLongOpt("data-loc")
-                .withDescription("Location to store the built indexes")
+                .withDescription("Final location to store the built indexes shards")
                 .isRequired()
                 .create('d');
         options.addOption(dataLoc);
         final Option buildLoc = OptionBuilder.withArgName("path")
                 .hasArg()
                 .withLongOpt("build-loc")
-                .withDescription("Local directory were the indexes are built")
+                .withDescription("Local directory where the indexes are built")
                 .create('b');
         options.addOption(buildLoc);
         final Option hdfsPrincipal = OptionBuilder.withArgName("name")
