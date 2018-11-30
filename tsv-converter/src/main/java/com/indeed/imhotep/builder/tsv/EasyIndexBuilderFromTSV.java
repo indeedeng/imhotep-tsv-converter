@@ -277,6 +277,9 @@ public class EasyIndexBuilderFromTSV extends EasyIndexBuilder {
             int rowsWithInvalidTimestamp = 0;
             while(iterator.hasNext()) {
                 final String[] values = iterator.next();
+                if (values.length == 0 || values.length == 1 && "".equals(values[0])) {
+                    continue;   // skip completely empty rows
+                }
                 rowNumber++;
                 final int valueCount = Math.min(values.length, indexFields.length);
                 if(valueCount != indexFields.length) {
