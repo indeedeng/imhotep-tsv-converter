@@ -191,8 +191,6 @@ public abstract class EasyIndexBuilder implements Bootable {
      * Allows manual document construction as an alternative to addDocument()
      */
     final protected void saveDocument(long docTimestamp) {
-        indexWriter.addTerm("allbit", "1", false);
-
         indexWriter.saveDocument(docTimestamp);
         int numDocs = indexWriter.getNumDocs();
         if (numDocs % 100000 == 0) {
