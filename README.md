@@ -1,5 +1,8 @@
 imhotep-tsv-converter
 =======
+
+![Lifecycle](https://img.shields.io/osslifecycle/indeedeng/imhotep-tsv-converter.svg)
+
 Tool to convert TSV files into Flamdex indexes for Imhotep.
 
 ## Discussion
@@ -20,6 +23,8 @@ https://travis-ci.org/indeedeng/imhotep-tsv-converter
 ## Contributing
 http://indeedeng.github.io/imhotep/docs/contributing/
 
-## License
+## Code of Conduct
+This project is governed by the [Contributor Covenant v 1.4.1](CODE_OF_CONDUCT.md)
 
-[Apache License Version 2.0](https://github.com/indeedeng/imhotep/blob/master/LICENSE)
+## License
+[Apache License Version 2.0](LICENSE)
